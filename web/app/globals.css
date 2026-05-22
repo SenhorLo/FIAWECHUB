@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* === FIA WEC brand palette === */
+  --color-night: #0a0a0f;
+  --color-day: #f4f1ea;
+  --color-wec-navy: #0f1a3d;
+  --color-wec-green: #00d26a;
+  --color-lemans-yellow: #ffd200;
+  --color-graphite: #1f2330;
+  --color-ink: #e8e6e0;
+  --color-muted: #8a8a93;
+
+  /* Semantic aliases */
+  --color-background: var(--color-night);
+  --color-foreground: var(--color-ink);
+  --color-accent: var(--color-wec-green);
+  --color-heritage: var(--color-lemans-yellow);
+
+  /* Typography */
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-wec-green);
+  color: var(--color-night);
+}

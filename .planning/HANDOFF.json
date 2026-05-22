@@ -1,8 +1,8 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-20T09:52:13.365Z",
+  "timestamp": "2026-05-22T01:35:29.774Z",
   "source": "auto-postool",
-  "partial": true,
+  "partial": false,
   "phase": null,
   "phase_name": null,
   "phase_dir": null,
@@ -15,7 +15,20 @@
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [],
-  "uncommitted_files": [],
+  "uncommitted_files": [
+    {
+      "status": "M",
+      "path": ".planning/HANDOFF.json"
+    },
+    {
+      "status": "D",
+      "path": "web"
+    },
+    {
+      "status": "??",
+      "path": "web/"
+    }
+  ],
   "next_action": null,
-  "context_notes": ""
+  "context_notes": "Recent commits:\ne82a51c first commit"
 }
