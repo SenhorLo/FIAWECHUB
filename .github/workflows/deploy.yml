@@ -36,7 +36,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        # `npm install` (not `npm ci`) so npm can reconcile platform-specific
+        # optional native deps (@emnapi/*, *-linux-x64) that the lockfile
+        # generated on Windows resolves differently on Linux. npm ci is strict
+        # and fails with EUSAGE on that cross-platform drift.
+        run: npm install --no-audit --no-fund
 
       - name: Build static export
         run: npm run build
