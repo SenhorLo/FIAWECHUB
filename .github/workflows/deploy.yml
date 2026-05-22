@@ -29,7 +29,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Match the Node/npm that generated package-lock.json (npm 11),
+          # otherwise `npm ci` rejects the lockfile as out of sync.
+          node-version: 24
           cache: npm
           cache-dependency-path: web/package-lock.json
 
