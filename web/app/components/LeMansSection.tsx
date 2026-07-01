@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, type Variants } from "framer-motion";
 import { leMansStats, leMansSectors } from "../data/le-mans";
 import { asset } from "../lib/asset";
-
-const TARGET = new Date("2026-06-13T15:00:00+02:00");
+import { useNextRace } from "../lib/useNextRace";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -16,27 +15,9 @@ const fadeUp: Variants = {
   },
 };
 
-/* ---------- Dramatic countdown for Le Mans ---------- */
-function LeMansCountdown() {
-  const [mounted, setMounted] = useState(false);
-  const [parts, setParts] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    setMounted(true);
-    const update = () => {
-      const ms = Math.max(0, TARGET.getTime() - Date.now());
-      const s = Math.floor(ms / 1000);
-      setParts({
-        days: Math.floor(s / 86400),
-        hours: Math.floor((s % 86400) / 3600),
-        minutes: Math.floor((s % 3600) / 60),
-        seconds: s % 60,
-      });
-    };
-    update();
-    const id = setInterval(update, 1000);
-    return () => clearInterval(id);
-  }, []);
+/* ---------- Dramatic countdown for the next WEC round ---------- */
+function FinalCountdown() {
+  const { mounted, race, live, parts } = useNextRace();
 
   const pad = (n: number) => n.toString().padStart(2, "0");
   const cells = [
@@ -46,22 +27,84 @@ function LeMansCountdown() {
     { value: pad(parts.seconds), label: "Segundos" },
   ];
 
+  const eyebrow = !race
+    ? "Temporada encerrada"
+    : live
+    ? "Prova em andamento"
+    : "Faltam para a largada";
+
+  const heading = race ? race.name : "Até a temporada 2027";
+  const subheading = race
+    ? `${race.flag} ${race.country} · ${race.date}`
+    : "Novo calendário em breve";
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-heritage/15" suppressHydrationWarning>
-      {cells.map((c) => (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-12"
+      >
         <div
-          key={c.label}
-          className="bg-black p-6 md:p-10 text-center"
+          className="text-[10px] uppercase tracking-[0.3em] text-heritage mb-4"
+          suppressHydrationWarning
         >
-          <div className="font-display text-6xl md:text-8xl lg:text-9xl text-heritage tabular-nums leading-none">
-            {mounted ? c.value : "--"}
-          </div>
-          <div className="mt-3 text-[10px] md:text-xs uppercase tracking-[0.3em] text-muted">
-            {c.label}
-          </div>
+          {mounted ? eyebrow : "Próxima etapa"}
         </div>
-      ))}
-    </div>
+        <h3
+          className="font-display text-4xl md:text-6xl uppercase leading-[0.95]"
+          suppressHydrationWarning
+        >
+          {mounted ? heading : "Próxima etapa"}
+        </h3>
+        <div
+          className="mt-4 text-xs uppercase tracking-[0.3em] text-muted"
+          suppressHydrationWarning
+        >
+          {mounted ? subheading : ""}
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 gap-px bg-heritage/15"
+          suppressHydrationWarning
+        >
+          {cells.map((c) => (
+            <div key={c.label} className="bg-black p-6 md:p-10 text-center">
+              <div className="font-display text-6xl md:text-8xl lg:text-9xl text-heritage tabular-nums leading-none">
+                {mounted && race ? c.value : "--"}
+              </div>
+              <div className="mt-3 text-[10px] md:text-xs uppercase tracking-[0.3em] text-muted">
+                {c.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.6, duration: 0.8 }}
+        className="mt-8 text-center text-xs text-muted"
+        suppressHydrationWarning
+      >
+        {mounted && race
+          ? live
+            ? `${race.name} está acontecendo agora em ${race.track}.`
+            : `Largada em ${race.track}, ${race.country}.`
+          : "Contagem regressiva para a próxima etapa do Mundial."}
+      </motion.p>
+    </>
   );
 }
 
@@ -403,39 +446,7 @@ export function LeMansSection() {
 
       {/* ============ FINAL COUNTDOWN ============ */}
       <div className="relative px-6 md:px-12 lg:px-16 py-24 border-t border-heritage/10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <div className="text-[10px] uppercase tracking-[0.3em] text-heritage mb-4">
-            Faltam para a largada
-          </div>
-          <h3 className="font-display text-4xl md:text-6xl uppercase leading-[0.95]">
-            94ª edição · 13 jun 2026
-          </h3>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <LeMansCountdown />
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-8 text-center text-xs text-muted"
-        >
-          Largada às 15h00 CEST · Bandeirada às 15h00 CEST do domingo
-        </motion.p>
+        <FinalCountdown />
       </div>
     </section>
   );

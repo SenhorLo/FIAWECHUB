@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
-import { races, type Race } from "../data/races";
+import { races, getNextRace, type Race } from "../data/races";
 import { asset } from "../lib/asset";
 
 const fadeUp: Variants = {
@@ -123,9 +123,12 @@ export function CalendarSection() {
   const [nextSlug, setNextSlug] = useState<string | null>(null);
 
   useEffect(() => {
-    const now = new Date();
-    const upcoming = races.find((r) => new Date(r.dateISO) >= now);
-    setNextSlug(upcoming?.slug ?? null);
+    // Recalcula periodicamente para o card "próxima" avançar sozinho
+    // assim que a etapa atual termina, mesmo com a aba aberta.
+    const sync = () => setNextSlug(getNextRace()?.slug ?? null);
+    sync();
+    const id = setInterval(sync, 60_000);
+    return () => clearInterval(id);
   }, []);
 
   return (
